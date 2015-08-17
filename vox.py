@@ -1,9 +1,8 @@
-#
-#
-#  vox.py
-#  ------
-#
-#
+"""
+Vox
+---
+Enzo Calamia, 2015
+"""
 
 import sys
 from random import randint
@@ -13,7 +12,7 @@ import statistics as stat
 
 MAX_INT = 2**64-1
 
-
+R = namedtuple('R', 'val')
 I = namedtuple('I', 'val')
 S = namedtuple('S', 'val')
 V = namedtuple('V', 'val')
@@ -38,15 +37,36 @@ def sum_(v):
     sigma = sum(i.val for i in v)
     return I(sigma)
 
-def avg_(v):
+def mean_(v):
     v = v.val
-    avg = stat.mean(i.val for i in v)
-    return I(int(avg))
+    mean = stat.mean(i.val for i in v)
+    return R(mean)
 
 def stdev_(v):
     v = v.val
     avg = stat.stdev(i.val for i in v)
-    return I(int(avg))
+    return R(avg)
+
+def cov_(X, Y):
+    X = [x.val for x in X.val]
+    Y = [y.val for y in Y.val]
+    Ex = stat.mean(X)
+    Ey = stat.mean(Y)
+    cov = sum((x-Ex)*(y-Ey) for x,y in zip(X,Y)) / (len(X)-1) 
+    return R(cov)
+    
+    cov = stat.mean(x*y for x,y in zip(X, Y))
+    cov -= stat.mean(X) * stat.mean(Y)
+    return R(cov)
+
+def beta_(X, Y):
+    cov = cov_(X, Y)
+    var = cov_(Y, Y)
+    cov = cov.val
+    var = var.val
+    return R(cov/var)
+    
+    
 
 def len_(v):
     v = v.val
@@ -56,13 +76,16 @@ def len_(v):
 
 binop_table = {
     '+': add_,
+    'cov': cov_,
+    'beta': beta_
 }
 
 op_table = {
     'sum': sum_,
     'len': len_,
-    'avg': avg_,
-    'stdev': stdev_
+    'mean': mean_,
+    'stdev': stdev_,
+    'var': lambda x: cov_(x, x)
 }
 
 def parse(xs):
