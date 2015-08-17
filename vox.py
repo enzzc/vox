@@ -65,8 +65,7 @@ def beta_(X, Y):
     cov = cov.val
     var = var.val
     return R(cov/var)
-    
-    
+
 
 def len_(v):
     v = v.val
