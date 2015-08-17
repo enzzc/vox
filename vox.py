@@ -40,13 +40,14 @@ def rdiff(xs):
 
 def rdiff_(v):
     v = [i.val for i in v.val]
-    diff_list = list(rdiff(v))
+    diff_list = [R(x) for x in rdiff(v)]
     return V(diff_list)
 
 def add_(x, y):
-    if isinstance(x, I):
+    if isinstance(x, I) or isinstance(x, R):
         x, y = x.val, y.val
-        return I(x + y)
+        z = x + y
+        return I(z) if isinstance(z, int) else R(z)
     if isinstance(x, V):
         x, y = x.val, y.val
         w = map(lambda t: add_(t[0], t[1]), zip(x, y))
