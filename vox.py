@@ -66,12 +66,10 @@ def beta_(X, Y):
     var = var.val
     return R(cov/var)
 
-
 def len_(v):
     v = v.val
     l = len(v)
     return I(l)
-
 
 binop_table = {
     '+': add_,
