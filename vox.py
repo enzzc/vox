@@ -22,6 +22,27 @@ Op = namedtuple('Op', 'val')
 class Err(Exception):
     pass
 
+def is_float(x):
+    try:
+        float(x)
+        return True
+    except ValueError:
+        return False
+
+def rdiff(xs):
+    while xs:
+        if len(xs) >= 2:
+            x, y, *_ = xs
+            yield (y - x) / x
+            xs = xs[1:]
+        else:
+            return
+
+def rdiff_(v):
+    v = [i.val for i in v.val]
+    diff_list = list(rdiff(v))
+    return V(diff_list)
+
 def add_(x, y):
     if isinstance(x, I):
         x, y = x.val, y.val
@@ -82,7 +103,8 @@ op_table = {
     'len': len_,
     'mean': mean_,
     'stdev': stdev_,
-    'var': lambda x: cov_(x, x)
+    'var': lambda x: cov_(x, x),
+    'rdiff': rdiff_
 }
 
 def parse(xs):
@@ -91,6 +113,8 @@ def parse(xs):
         x = next(xs)
         if x.isdigit():
             yield I(int(x))
+        elif is_float(x):
+            yield R(float(x))
         elif x == '(':
             yield V(list(parse(xs)))
         elif x == ')':
